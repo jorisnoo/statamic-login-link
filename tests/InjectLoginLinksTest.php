@@ -7,17 +7,16 @@ use Noo\StatamicLoginLink\Support\SecurityCheck;
 
 beforeEach(function () {
     config([
-        'statamic-login-link.users' => ['admin@example.com' => 'Admin'],
-        'statamic-login-link.allowed_environments' => ['testing'],
-        'statamic-login-link.allowed_ips' => ['127.0.0.1'],
-        'statamic-login-link.link_expiration_minutes' => 5,
+        'statamic.login-link.users' => ['admin@example.com' => 'Admin'],
+        'statamic.login-link.allowed_environments' => ['testing'],
+        'statamic.login-link.allowed_hosts' => ['localhost'],
+        'statamic.login-link.link_expiration_minutes' => 5,
     ]);
 });
 
-function createLoginRequest(string $ip = '127.0.0.1'): Request
+function createLoginRequest(): Request
 {
-    $request = Request::create('/cp/login', 'GET');
-    $request->server->set('REMOTE_ADDR', $ip);
+    $request = Request::create('http://localhost/cp/login', 'GET');
     $request->setRouteResolver(function () {
         $route = new \Illuminate\Routing\Route('GET', '/cp/login', []);
         $route->name('statamic.cp.login');
@@ -49,8 +48,7 @@ it('injects login links on the login page', function () {
 });
 
 it('does not inject on non-login routes', function () {
-    $request = Request::create('/cp/dashboard', 'GET');
-    $request->server->set('REMOTE_ADDR', '127.0.0.1');
+    $request = Request::create('http://localhost/cp/dashboard', 'GET');
     $request->setRouteResolver(function () {
         $route = new \Illuminate\Routing\Route('GET', '/cp/dashboard', []);
         $route->name('statamic.cp.dashboard');
@@ -64,8 +62,7 @@ it('does not inject on non-login routes', function () {
 });
 
 it('does not inject on POST requests', function () {
-    $request = Request::create('/cp/login', 'POST');
-    $request->server->set('REMOTE_ADDR', '127.0.0.1');
+    $request = Request::create('http://localhost/cp/login', 'POST');
     $request->setRouteResolver(function () {
         $route = new \Illuminate\Routing\Route('POST', '/cp/login', []);
         $route->name('statamic.cp.login');
@@ -79,7 +76,7 @@ it('does not inject on POST requests', function () {
 });
 
 it('does not inject when security check fails', function () {
-    config(['statamic-login-link.allowed_environments' => ['production']]);
+    config(['statamic.login-link.allowed_environments' => ['production']]);
 
     $request = createLoginRequest();
     $response = runMiddleware($request);
@@ -88,7 +85,7 @@ it('does not inject when security check fails', function () {
 });
 
 it('does not inject when no users are configured', function () {
-    config(['statamic-login-link.users' => []]);
+    config(['statamic.login-link.users' => []]);
 
     $request = createLoginRequest();
     $response = runMiddleware($request);
@@ -96,8 +93,15 @@ it('does not inject when no users are configured', function () {
     expect($response->getContent())->not->toContain('statamic-login-links');
 });
 
-it('does not inject when ip is not allowed', function () {
-    $request = createLoginRequest('192.168.1.100');
+it('does not inject when host is not allowed', function () {
+    $request = Request::create('http://evil.com/cp/login', 'GET');
+    $request->setRouteResolver(function () {
+        $route = new \Illuminate\Routing\Route('GET', '/cp/login', []);
+        $route->name('statamic.cp.login');
+
+        return $route;
+    });
+
     $response = runMiddleware($request);
 
     expect($response->getContent())->not->toContain('statamic-login-links');
@@ -113,7 +117,7 @@ it('does not inject on non-html responses', function () {
 });
 
 it('renders multiple user buttons', function () {
-    config(['statamic-login-link.users' => [
+    config(['statamic.login-link.users' => [
         'admin@example.com' => 'Admin',
         'editor@example.com' => 'Editor',
     ]]);

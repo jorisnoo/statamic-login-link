@@ -31,13 +31,13 @@ class LoginLinkController
 
         $request->session()->regenerate();
 
-        $redirect = config('statamic-login-link.redirect_url') ?? cp_route('index');
+        $redirect = config('statamic.login-link.redirect_url') ?? cp_route('index');
 
         return redirect($redirect);
     }
 
     protected function isConfiguredUser(string $email): bool
     {
-        return array_key_exists($email, config('statamic-login-link.users', []));
+        return array_key_exists($email, config('statamic.login-link.users', []));
     }
 }

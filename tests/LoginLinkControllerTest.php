@@ -5,10 +5,10 @@ use Statamic\Facades\User;
 
 beforeEach(function () {
     config([
-        'statamic-login-link.users' => ['admin@example.com' => 'Admin'],
-        'statamic-login-link.allowed_environments' => ['testing'],
-        'statamic-login-link.allowed_ips' => ['127.0.0.1'],
-        'statamic-login-link.link_expiration_minutes' => 5,
+        'statamic.login-link.users' => ['admin@example.com' => 'Admin'],
+        'statamic.login-link.allowed_environments' => ['testing'],
+        'statamic.login-link.allowed_hosts' => ['localhost'],
+        'statamic.login-link.link_expiration_minutes' => 5,
     ]);
 });
 
@@ -24,7 +24,7 @@ function signedLoginUrl(string $email = 'admin@example.com', ?int $minutes = nul
 {
     return URL::temporarySignedRoute(
         'statamic.cp.login-link',
-        now()->addMinutes($minutes ?? config('statamic-login-link.link_expiration_minutes')),
+        now()->addMinutes($minutes ?? config('statamic.login-link.link_expiration_minutes')),
         ['email' => $email],
     );
 }
@@ -64,14 +64,14 @@ it('rejects expired signatures', function () {
 
 it('rejects when environment is not allowed', function () {
     createTestUser();
-    config(['statamic-login-link.allowed_environments' => ['production']]);
+    config(['statamic.login-link.allowed_environments' => ['production']]);
 
     $this->get(signedLoginUrl())->assertStatus(403);
 });
 
-it('rejects when ip is not allowed', function () {
+it('rejects when host is not allowed', function () {
     createTestUser();
-    config(['statamic-login-link.allowed_ips' => ['10.0.0.1']]);
+    config(['statamic.login-link.allowed_hosts' => ['evil.com']]);
 
     $this->get(signedLoginUrl())->assertStatus(403);
 });
@@ -89,7 +89,7 @@ it('rejects unconfigured users', function () {
 });
 
 it('rejects non-existent users', function () {
-    config(['statamic-login-link.users' => ['nonexistent@example.com' => 'Ghost']]);
+    config(['statamic.login-link.users' => ['nonexistent@example.com' => 'Ghost']]);
 
     $url = signedLoginUrl('nonexistent@example.com');
 
@@ -105,7 +105,7 @@ it('redirects to cp index by default', function () {
 
 it('redirects to custom url when configured', function () {
     createTestUser();
-    config(['statamic-login-link.redirect_url' => '/cp/collections']);
+    config(['statamic.login-link.redirect_url' => '/cp/collections']);
 
     $this->get(signedLoginUrl())
         ->assertRedirect('/cp/collections');

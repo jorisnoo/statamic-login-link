@@ -54,8 +54,8 @@ class InjectLoginLinks
 
     protected function buildHtml(): string
     {
-        $users = config('statamic-login-link.users', []);
-        $expiration = now()->addMinutes(config('statamic-login-link.link_expiration_minutes', 5));
+        $users = config('statamic.login-link.users', []);
+        $expiration = now()->addMinutes(config('statamic.login-link.link_expiration_minutes', 5));
 
         $buttons = '';
 

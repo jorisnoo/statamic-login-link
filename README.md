@@ -15,7 +15,7 @@ Inspired by [spatie/laravel-login-link](https://github.com/spatie/laravel-login-
 ## Installation
 
 ```bash
-composer require noo/statamic-login-link --dev
+composer require jorisnoo/statamic-login-link --dev
 ```
 
 Publish the config file:
@@ -26,7 +26,7 @@ php artisan vendor:publish --tag=statamic-login-link-config
 
 ## Configuration
 
-Add users to `config/statamic-login-link.php`:
+Add users to `config/statamic/login-link.php`:
 
 ```php
 return [
@@ -36,7 +36,7 @@ return [
     ],
 
     'allowed_environments' => ['local'],
-    'allowed_ips' => ['127.0.0.1', '::1'],
+    'allowed_hosts' => ['localhost', '127.0.0.1', '*.test'],
     'redirect_url' => null, // null = CP index
     'link_expiration_minutes' => 5,
 ];
@@ -59,13 +59,13 @@ The package is gated by multiple independent layers:
 |---|---|
 | Empty user list = disabled | Package is inert until configured |
 | Environment whitelist (`local`) | Any injection/login on production |
-| IP whitelist (`127.0.0.1`, `::1`) | Remote access even on local env |
+| Host whitelist (`localhost`, `*.test`) | Remote access even on local env |
 | Signed URL with 5-min expiry | URL tampering, replay attacks |
 | Configured user check | Login as non-configured users |
 | User existence check | Login as non-existent users |
 | Session regeneration | Session fixation |
 
-Middleware and controller enforce environment + IP checks **independently** — even if middleware is somehow bypassed, the controller still rejects.
+Middleware and controller enforce environment + host checks **independently** — even if middleware is somehow bypassed, the controller still rejects.
 
 ## Testing
 

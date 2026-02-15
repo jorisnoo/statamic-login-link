@@ -10,21 +10,29 @@ class SecurityCheck
     {
         return $this->hasConfiguredUsers()
             && $this->isAllowedEnvironment()
-            && $this->isAllowedIp($request);
+            && $this->isAllowedHost($request);
     }
 
     public function hasConfiguredUsers(): bool
     {
-        return count(config('statamic-login-link.users', [])) > 0;
+        return count(config('statamic.login-link.users', [])) > 0;
     }
 
     public function isAllowedEnvironment(): bool
     {
-        return app()->environment(config('statamic-login-link.allowed_environments', []));
+        return app()->environment(config('statamic.login-link.allowed_environments', []));
     }
 
-    public function isAllowedIp(Request $request): bool
+    public function isAllowedHost(Request $request): bool
     {
-        return in_array($request->ip(), config('statamic-login-link.allowed_ips', []));
+        $currentHost = $request->getHost();
+
+        foreach (config('statamic.login-link.allowed_hosts', []) as $allowedHost) {
+            if (fnmatch($allowedHost, $currentHost)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

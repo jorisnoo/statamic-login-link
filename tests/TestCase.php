@@ -16,6 +16,6 @@ abstract class TestCase extends AddonTestCase
     {
         parent::resolveApplicationConfiguration($app);
 
-        $app['config']->set('statamic-login-link', require __DIR__.'/../config/statamic-login-link.php');
+        $app['config']->set('statamic.login-link', require __DIR__.'/../config/statamic/login-link.php');
     }
 }

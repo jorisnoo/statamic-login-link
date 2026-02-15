@@ -1,5 +1,5 @@
 {
-    "name": "noo/statamic-login-link",
+    "name": "jorisnoo/statamic-login-link",
     "description": "One-click developer login buttons for Statamic CP on localhost",
     "type": "statamic-addon",
     "license": "MIT",

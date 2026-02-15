@@ -19,13 +19,13 @@ class ServiceProvider extends AddonServiceProvider
     {
         parent::register();
 
-        $this->mergeConfigFrom(__DIR__.'/../config/statamic-login-link.php', 'statamic-login-link');
+        $this->mergeConfigFrom(__DIR__.'/../config/statamic/login-link.php', 'statamic.login-link');
     }
 
     public function bootAddon(): void
     {
         $this->publishes([
-            __DIR__.'/../config/statamic-login-link.php' => config_path('statamic-login-link.php'),
+            __DIR__.'/../config/statamic/login-link.php' => config_path('statamic/login-link.php'),
         ], 'statamic-login-link-config');
 
         $this->registerLoginLinkRoute();

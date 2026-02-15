@@ -31,15 +31,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Allowed IPs
+    | Allowed Hosts
     |--------------------------------------------------------------------------
     |
     | The login link buttons will only be shown and the login route will only
-    | work when the request originates from one of these IP addresses.
+    | work when the request host matches one of these values. Wildcard
+    | patterns are supported via fnmatch().
     |
     */
 
-    'allowed_ips' => ['127.0.0.1', '::1'],
+    'allowed_hosts' => ['localhost', '127.0.0.1', '*.test'],
 
     /*
     |--------------------------------------------------------------------------
