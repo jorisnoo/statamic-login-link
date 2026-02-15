@@ -88,16 +88,16 @@ class InjectLoginLinks
         </div>
         <style>
             #statamic-login-links {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                display: flex;
+                display: none;
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 8px;
                 padding: 16px;
-                z-index: 9999;
+                margin-top: 16px;
+                max-width: 440px;
+            }
+            #statamic-login-links.visible {
+                display: flex;
             }
             .statamic-login-links-divider {
                 width: 100%;
@@ -151,6 +151,19 @@ class InjectLoginLinks
                 color: #6b7280;
             }
         </style>
+        <script>
+            (function place() {
+                var form = document.querySelector('#statamic form');
+                var links = document.getElementById('statamic-login-links');
+                if (form) {
+                    var card = form.closest('.card') || form.parentElement;
+                    card.after(links);
+                    links.classList.add('visible');
+                } else {
+                    requestAnimationFrame(place);
+                }
+            })();
+        </script>
 
         HTML;
     }
