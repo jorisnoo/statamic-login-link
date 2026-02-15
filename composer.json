@@ -1,0 +1,43 @@
+{
+    "name": "noo/statamic-login-link",
+    "description": "One-click developer login buttons for Statamic CP on localhost",
+    "type": "statamic-addon",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "statamic/cms": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Noo\\StatamicLoginLink\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Noo\\StatamicLoginLink\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Noo\\StatamicLoginLink\\ServiceProvider"
+            ]
+        },
+        "statamic": {
+            "name": "Login Link",
+            "description": "One-click developer login buttons for Statamic CP"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
