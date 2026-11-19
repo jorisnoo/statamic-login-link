@@ -33,7 +33,8 @@ it('authenticates a valid user via signed url', function () {
     createTestUser();
 
     $this->get(signedLoginUrl())
-        ->assertRedirect();
+        ->assertRedirect()
+        ->assertSessionHas('statamic_elevated_session');
 
     expect(auth()->check())->toBeTrue();
     expect(auth()->user()->email())->toBe('admin@example.com');
@@ -75,6 +76,18 @@ it('rejects when host is not allowed', function () {
 
     $this->get(signedLoginUrl())->assertStatus(403);
 });
+
+it('denies a valid link unless the peer is directly local', function (array $server) {
+    createTestUser();
+
+    $this->withServerVariables($server)->get(signedLoginUrl())->assertForbidden();
+    $this->assertGuest();
+})->with([
+    'nonlocal peer' => [['REMOTE_ADDR' => '192.0.2.10']],
+    'unknown peer' => [['REMOTE_ADDR' => '']],
+    'forwarded request' => [['REMOTE_ADDR' => '127.0.0.1', 'HTTP_FORWARDED' => 'for=192.0.2.10']],
+    'tunneled request' => [['REMOTE_ADDR' => '::1', 'HTTP_X_FORWARDED_HOST' => 'localhost']],
+]);
 
 it('rejects unconfigured users', function () {
     User::make()->email('hacker@example.com')->makeSuper()->save();

@@ -14,6 +14,24 @@ beforeEach(function () {
     ]);
 });
 
+it('offers signed developer links on the real CP login page only to a direct local client', function () {
+    $page = $this->get('/cp/auth/login')->assertOk();
+    $page->assertSee('id="statamic-login-links"', false);
+    expect($page->headers->get('Cache-Control'))->toContain('no-store');
+
+    $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.10'])
+        ->get('/cp/auth/login')
+        ->assertOk()
+        ->assertDontSee('id="statamic-login-links"', false);
+});
+
+it('leaves the Inertia login response as JSON', function () {
+    $this->withHeader('X-Inertia', 'true')->get('/cp/auth/login')
+        ->assertOk()
+        ->assertJsonStructure(['component', 'props'])
+        ->assertDontSee('id="statamic-login-links"', false);
+});
+
 function createLoginRequest(): Request
 {
     $request = Request::create('http://localhost/cp/login', 'GET');

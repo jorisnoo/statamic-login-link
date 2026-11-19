@@ -10,7 +10,24 @@ class SecurityCheck
     {
         return $this->hasConfiguredUsers()
             && $this->isAllowedEnvironment()
+            && $this->isDirectLocalRequest($request)
             && $this->isAllowedHost($request);
+    }
+
+    private function isDirectLocalRequest(Request $request): bool
+    {
+        if (! in_array($request->server('REMOTE_ADDR'), ['127.0.0.1', '::1'], true)) {
+            return false;
+        }
+
+        foreach ($request->headers->keys() as $header) {
+            if (str_starts_with($header, 'x-forwarded-')
+                || in_array($header, ['forwarded', 'via', 'x-real-ip', 'x-original-host', 'x-exposed-by'], true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function hasConfiguredUsers(): bool
@@ -28,7 +45,7 @@ class SecurityCheck
         $currentHost = $request->getHost();
 
         foreach (config('statamic.login-link.allowed_hosts', []) as $allowedHost) {
-            if (fnmatch($allowedHost, $currentHost)) {
+            if (fnmatch(strtolower($allowedHost), $currentHost)) {
                 return true;
             }
         }

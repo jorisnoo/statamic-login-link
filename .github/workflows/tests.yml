@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }} / Testbench ${{ matrix.testbench }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.3'
+            testbench: '^10'
+            prefer: --prefer-lowest
+          - php: '8.4'
+            testbench: '^10'
+            prefer: --prefer-stable
+          - php: '8.5'
+            testbench: '^11'
+            prefer: --prefer-stable
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: shivammathur/setup-php@2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: bcmath, exif, gd, intl, mbstring, pdo_sqlite, zip
+          coverage: none
+      - run: composer update --with "orchestra/testbench:${{ matrix.testbench }}" ${{ matrix.prefer }} --prefer-stable --prefer-dist --no-interaction
+      - run: vendor/bin/pest --ci
+
+  checks:
+    name: Package checks
+    if: ${{ always() }}
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "$RESULT" = success
+        env:
+          RESULT: ${{ needs.tests.result }}

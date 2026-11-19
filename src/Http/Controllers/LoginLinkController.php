@@ -28,6 +28,7 @@ class LoginLinkController
         $guard = config('statamic.users.guards.cp', 'web');
 
         Auth::guard($guard)->login($user);
+        $request->session()->elevate();
 
         $request->session()->regenerate();
 
