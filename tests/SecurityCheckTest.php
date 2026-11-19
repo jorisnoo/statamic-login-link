@@ -68,7 +68,7 @@ it('checks allowed environment', function () {
 });
 
 it('checks allowed host', function () {
-    config(['statamic.login-link.allowed_hosts' => ['localhost', '*.test']]);
+    config(['statamic.login-link.allowed_hosts' => ['LOCALHOST', '*.TEST']]);
 
     $request = Request::create('http://localhost/cp/login');
     expect($this->securityCheck->isAllowedHost($request))->toBeTrue();

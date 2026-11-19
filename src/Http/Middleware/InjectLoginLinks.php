@@ -20,6 +20,7 @@ class InjectLoginLinks
 
         if ($this->shouldInject($request, $response)) {
             $this->injectLoginLinks($response);
+            $response->headers->set('Cache-Control', 'private, no-store');
         }
 
         return $response;
@@ -88,16 +89,13 @@ class InjectLoginLinks
         </div>
         <style>
             #statamic-login-links {
-                display: none;
+                display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 8px;
                 padding: 16px;
-                margin-top: 16px;
+                margin: 16px auto;
                 max-width: 440px;
-            }
-            #statamic-login-links.visible {
-                display: flex;
             }
             .statamic-login-links-divider {
                 width: 100%;
@@ -151,19 +149,6 @@ class InjectLoginLinks
                 color: #6b7280;
             }
         </style>
-        <script>
-            (function place() {
-                var form = document.querySelector('#statamic form');
-                var links = document.getElementById('statamic-login-links');
-                if (form) {
-                    var card = form.closest('.card') || form.parentElement;
-                    card.after(links);
-                    links.classList.add('visible');
-                } else {
-                    requestAnimationFrame(place);
-                }
-            })();
-        </script>
 
         HTML;
     }
